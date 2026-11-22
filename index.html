@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AssetCompare Pro | Comparador con Ticker / ISIN Personalizado</title>
+    <title>RecetarioScore | Mi Recetario Interactivo</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -32,327 +32,320 @@
         body {
             background-color: #090d16;
             color: #f8fafc;
-            background-image: 
-                radial-gradient(at 0% 0%, rgba(56, 189, 248, 0.05) 0px, transparent 50%),
-                radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.05) 0px, transparent 50%);
+            background-image:
+                radial-gradient(at 0% 0%, rgba(16, 185, 129, 0.06) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(56, 189, 248, 0.06) 0px, transparent 50%);
         }
         .glass-card {
             background: rgba(15, 23, 42, 0.75);
             backdrop-filter: blur(12px);
             border: 1px solid rgba(51, 65, 85, 0.6);
         }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
-<body class="min-h-screen flex flex-col antialiased selection:bg-sky-500/30 selection:text-sky-200 p-3 sm:p-6">
+<body class="min-h-screen flex flex-col antialiased selection:bg-emerald-500/30 selection:text-emerald-200 p-2 sm:p-4">
 
-    <!-- Navbar -->
+    <!-- Navbar unificada -->
     <header class="border-b border-slate-800/80 bg-slate-950/80 backdrop-blur-md sticky top-0 z-30 rounded-xl mb-6">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
             <div class="flex items-center gap-2.5">
-                <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-sky-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-sky-500/20">
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-lg shadow-emerald-500/20">
                     <svg class="w-5 h-5 text-slate-950" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                     </svg>
                 </div>
                 <div>
-                    <span class="font-bold text-lg tracking-tight text-white">Asset<span class="text-sky-400">Compare</span> Pro</span>
-                    <span class="hidden sm:inline-block ml-2 text-[11px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-700">Buscador Ticker / ISIN</span>
+                    <span class="font-bold text-lg tracking-tight text-white">Recetario<span class="text-emerald-400">Score</span></span>
+                    <span class="hidden sm:inline-block ml-2 text-[11px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-700">Google Sheets Sync</span>
                 </div>
             </div>
             <div class="flex items-center gap-3 text-xs text-slate-400">
-                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-sky-500/10 text-sky-400 border border-sky-500/20 font-mono">
-                    <span class="w-1.5 h-1.5 rounded-full bg-sky-400 animate-pulse"></span>
-                    Motor Activo
+                <a id="link-sheet" href="#" target="_blank" class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition font-mono">
+                    Abrir Hoja ↗
+                </a>
+                <span id="badge-sync" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-mono">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                    Recetario Activo
                 </span>
             </div>
         </div>
     </header>
 
-    <!-- Main Content -->
-    <main class="flex-1 max-w-7xl w-full mx-auto space-y-6">
+    <main class="flex-1 max-w-6xl w-full mx-auto px-2 sm:px-6 py-2 space-y-6">
 
-        <!-- Sección de Añadir Ticker / ISIN Personalizado -->
-        <section class="glass-card rounded-2xl p-5 sm:p-6 shadow-xl border-sky-500/30">
-            <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+        <!-- Buscador y Filtros -->
+        <section class="glass-card rounded-2xl p-5 sm:p-6 shadow-xl space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
-                    <h2 class="text-base font-semibold text-white flex items-center gap-2">
-                        <svg class="w-5 h-5 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                        Añadir Producto Personalizado por Ticker o ISIN
-                    </h2>
-                    <p class="text-xs text-slate-400 mt-0.5">Introduce cualquier símbolo o ISIN externo para estimar sus datos e integrarlo en la matriz.</p>
+                    <h1 class="text-xl sm:text-2xl font-bold tracking-tight text-white">Consulta tus recetas guardadas</h1>
+                    <p class="text-xs sm:text-sm text-slate-400">Filtra por categoría, busca por ingrediente y ajusta las raciones al cocinar.</p>
                 </div>
-                <div class="flex items-center gap-2 w-full md:w-auto">
-                    <input type="text" id="custom-input" placeholder="Ej. TSLA, IE00B4L5Y983..." class="bg-slate-950 border border-slate-700 rounded-xl px-4 py-2 text-xs text-white font-mono uppercase w-full md:w-48 focus:outline-none focus:border-sky-500">
-                    <select id="custom-type" class="bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white font-mono focus:outline-none focus:border-sky-500">
-                        <option value="ETF">ETF</option>
-                        <option value="Fondo Indexado">Fondo</option>
-                        <option value="Acción">Acción</option>
-                        <option value="Monetario">Monetario</option>
-                    </select>
-                    <button type="button" onclick="addCustomProduct()" class="bg-sky-500 hover:bg-sky-400 text-slate-950 font-semibold text-xs px-4 py-2 rounded-xl transition cursor-pointer whitespace-nowrap shadow-md shadow-sky-500/20">
-                        Añadir
-                    </button>
+                <div class="text-xs font-mono text-slate-400 bg-slate-950/80 px-3 py-1.5 rounded-lg border border-slate-800 self-start">
+                    Total: <strong id="contador-recetas" class="text-emerald-400">0</strong> recetas
                 </div>
             </div>
+
+            <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <svg class="h-4 w-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
+                </div>
+                <input
+                    type="text"
+                    id="buscador-recetas"
+                    placeholder="Buscar por nombre o ingrediente (ej. roscón, harina, pollo, patatas...)"
+                    autocomplete="off"
+                    class="block w-full pl-11 pr-4 py-3 bg-slate-950/90 border border-slate-700 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-all"
+                >
+            </div>
+
+            <div id="chips-categorias" class="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1"></div>
         </section>
 
-        <!-- Selectores A vs B por Categoría -->
-        <section class="glass-card rounded-2xl p-5 sm:p-7 shadow-xl">
-            <div class="max-w-3xl mx-auto text-center space-y-2 mb-6">
-                <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-white">
-                    Compara Productos Frente a Frente (A vs B)
-                </h1>
-                <p class="text-sm sm:text-base text-slate-400">
-                    Selecciona dos opciones dentro de cada categoría para enfrentar sus comisiones (TER) y rentabilidad.
-                </p>
+        <!-- Grid principal: Lista izquierda (4 cols) + Ficha de receta derecha (8 cols) -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+            <!-- Columna izquierda: Tarjetas de recetas -->
+            <div class="lg:col-span-4 space-y-3">
+                <div id="lista-recetas" class="space-y-2.5 max-h-[680px] overflow-y-auto pr-1"></div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4" id="categories-grid">
-                
-                <!-- 01. Fondos Indexados (A vs B) -->
-                <div class="bg-slate-950/80 p-4 rounded-xl border border-slate-800 flex flex-col justify-between space-y-3">
-                    <div>
-                        <span class="text-xs text-sky-400 font-mono font-semibold uppercase block mb-2">01. Fondo vs Fondo</span>
-                        
-                        <label class="text-[11px] text-slate-400 block">Opción A</label>
-                        <select id="sel-fondo-a" onchange="updateComparison()" class="sel-prod w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white font-mono focus:outline-none focus:border-sky-500 mb-2.5">
-                            <option value="vanguard_world" selected>Vanguard Global Stock (IE00B03HCZ61)</option>
-                            <option value="amundi_world">Amundi MSCI World (LU1829221024)</option>
-                        </select>
+            <!-- Columna derecha: Detalle completo de la receta -->
+            <div class="lg:col-span-8">
+                <div id="ficha-receta" class="glass-card rounded-2xl p-6 shadow-xl space-y-6">
+                    <div class="flex flex-wrap items-start justify-between gap-4 border-b border-slate-800 pb-4">
+                        <div>
+                            <span id="det-categoria" class="text-xs font-mono uppercase tracking-wider px-2.5 py-1 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">Categoría</span>
+                            <h2 id="det-titulo" class="text-2xl font-bold text-white mt-2">Selecciona una receta</h2>
+                        </div>
 
-                        <label class="text-[11px] text-slate-400 block">Opción B</label>
-                        <select id="sel-fondo-b" onchange="updateComparison()" class="sel-prod w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white font-mono focus:outline-none focus:border-sky-500">
-                            <option value="vanguard_world">Vanguard Global Stock (IE00B03HCZ61)</option>
-                            <option value="amundi_world" selected>Amundi MSCI World (LU1829221024)</option>
-                        </select>
+                        <div class="flex items-center gap-3">
+                            <div class="bg-slate-950/80 border border-slate-800 rounded-xl px-3.5 py-2 text-right">
+                                <span class="text-[11px] font-mono uppercase text-slate-500 block">Tiempo</span>
+                                <span id="det-tiempo" class="text-sm font-mono font-semibold text-slate-200">--</span>
+                            </div>
+                            <div class="bg-slate-950/80 border border-slate-800 rounded-xl px-3.5 py-2 text-right">
+                                <span class="text-[11px] font-mono uppercase text-slate-500 block">Raciones</span>
+                                <div class="flex items-center gap-1.5 mt-0.5">
+                                    <button type="button" onclick="cambiarRaciones(-1)" class="w-6 h-6 rounded bg-slate-800 hover:bg-slate-700 text-white font-mono text-xs cursor-pointer">-</button>
+                                    <span id="det-raciones" class="text-sm font-mono font-bold text-emerald-400 min-w-[24px] text-center">--</span>
+                                    <button type="button" onclick="cambiarRaciones(1)" class="w-6 h-6 rounded bg-slate-800 hover:bg-slate-700 text-white font-mono text-xs cursor-pointer">+</button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div id="duel-fondo" class="pt-3 border-t border-slate-900 text-xs space-y-1"></div>
-                </div>
 
-                <!-- 02. ETFs (A vs B) -->
-                <div class="bg-slate-950/80 p-4 rounded-xl border border-slate-800 flex flex-col justify-between space-y-3">
-                    <div>
-                        <span class="text-xs text-indigo-400 font-mono font-semibold uppercase block mb-2">02. ETF vs ETF</span>
-                        
-                        <label class="text-[11px] text-slate-400 block">Opción A</label>
-                        <select id="sel-etf-a" onchange="updateComparison()" class="sel-prod w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white font-mono focus:outline-none focus:border-indigo-500 mb-2.5">
-                            <option value="ishares_sp500" selected>iShares Core S&P 500 (CSSPX)</option>
-                            <option value="vanguard_vwce">Vanguard FTSE All-World (VWCE)</option>
-                        </select>
-
-                        <label class="text-[11px] text-slate-400 block">Opción B</label>
-                        <select id="sel-etf-b" onchange="updateComparison()" class="sel-prod w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white font-mono focus:outline-none focus:border-indigo-500">
-                            <option value="ishares_sp500">iShares Core S&P 500 (CSSPX)</option>
-                            <option value="vanguard_vwce" selected>Vanguard FTSE All-World (VWCE)</option>
-                        </select>
+                    <!-- Ingredientes -->
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-sm font-mono uppercase tracking-wider text-sky-400 font-semibold">🥗 Ingredientes</h3>
+                            <span id="nota-escalado" class="hidden text-xs font-mono text-amber-300">Cantidades escaladas proporcionalmente</span>
+                        </div>
+                        <ul id="det-ingredientes" class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-slate-200"></ul>
                     </div>
-                    <div id="duel-etf" class="pt-3 border-t border-slate-900 text-xs space-y-1"></div>
-                </div>
 
-                <!-- 03. Fondos Monetarios (A vs B) -->
-                <div class="bg-slate-950/80 p-4 rounded-xl border border-slate-800 flex flex-col justify-between space-y-3">
-                    <div>
-                        <span class="text-xs text-emerald-400 font-mono font-semibold uppercase block mb-2">03. Monetario vs Monetario</span>
-                        
-                        <label class="text-[11px] text-slate-400 block">Opción A</label>
-                        <select id="sel-monetary-a" onchange="updateComparison()" class="sel-prod w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white font-mono focus:outline-none focus:border-emerald-500 mb-2.5">
-                            <option value="groupama" selected>Groupama Trésorerie IC</option>
-                            <option value="axa_treasury">AXA Court Terme AC</option>
-                        </select>
-
-                        <label class="text-[11px] text-slate-400 block">Opción B</label>
-                        <select id="sel-monetary-b" onchange="updateComparison()" class="sel-prod w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white font-mono focus:outline-none focus:border-emerald-500">
-                            <option value="groupama">Groupama Trésorerie IC</option>
-                            <option value="axa_treasury" selected>AXA Court Terme AC</option>
-                        </select>
+                    <!-- Pasos -->
+                    <div class="space-y-3 pt-4 border-t border-slate-800/80">
+                        <h3 class="text-sm font-mono uppercase tracking-wider text-emerald-400 font-semibold">👨‍🍳 Elaboración paso a paso</h3>
+                        <ol id="det-pasos" class="space-y-3 text-sm text-slate-300 leading-relaxed"></ol>
                     </div>
-                    <div id="duel-monetary" class="pt-3 border-t border-slate-900 text-xs space-y-1"></div>
-                </div>
-
-                <!-- 04. Acciones Directas (A vs B) -->
-                <div class="bg-slate-950/80 p-4 rounded-xl border border-slate-800 flex flex-col justify-between space-y-3">
-                    <div>
-                        <span class="text-xs text-amber-400 font-mono font-semibold uppercase block mb-2">04. Acción vs Acción</span>
-                        
-                        <label class="text-[11px] text-slate-400 block">Opción A</label>
-                        <select id="sel-stock-a" onchange="updateComparison()" class="sel-prod w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white font-mono focus:outline-none focus:border-amber-500 mb-2.5">
-                            <option value="apple" selected>Apple Inc. (AAPL)</option>
-                            <option value="microsoft">Microsoft Corp. (MSFT)</option>
-                        </select>
-
-                        <label class="text-[11px] text-slate-400 block">Opción B</label>
-                        <select id="sel-stock-b" onchange="updateComparison()" class="sel-prod w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white font-mono focus:outline-none focus:border-amber-500">
-                            <option value="apple">Apple Inc. (AAPL)</option>
-                            <option value="microsoft" selected>Microsoft Corp. (MSFT)</option>
-                        </select>
-                    </div>
-                    <div id="duel-stock" class="pt-3 border-t border-slate-900 text-xs space-y-1"></div>
-                </div>
-
-            </div>
-        </section>
-
-        <!-- Matriz Comparativa Detallada -->
-        <div class="glass-card rounded-2xl p-6 overflow-x-auto">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
-                <div>
-                    <h3 class="font-semibold text-base text-white">Matriz Comparativa Detallada</h3>
-                    <p class="text-xs text-slate-400">Listado completo de productos seleccionados y personalizados.</p>
-                </div>
-                
-                <!-- Filtros rápidos -->
-                <div class="flex flex-wrap gap-1.5 text-xs">
-                    <button type="button" onclick="setFilter('all')" id="flt-all" class="flt-btn px-3 py-1.5 rounded-lg font-medium bg-sky-500 text-slate-950 transition cursor-pointer">Todos</button>
-                    <button type="button" onclick="setFilter('Fondo Indexado')" id="flt-Fondo Indexado" class="flt-btn px-3 py-1.5 rounded-lg font-medium bg-slate-800 text-slate-300 hover:bg-slate-700 transition cursor-pointer">Fondos</button>
-                    <button type="button" onclick="setFilter('ETF')" id="flt-ETF" class="flt-btn px-3 py-1.5 rounded-lg font-medium bg-slate-800 text-slate-300 hover:bg-slate-700 transition cursor-pointer">ETFs</button>
-                    <button type="button" onclick="setFilter('Monetario')" id="flt-Monetario" class="flt-btn px-3 py-1.5 rounded-lg font-medium bg-slate-800 text-slate-300 hover:bg-slate-700 transition cursor-pointer">Monetarios</button>
-                    <button type="button" onclick="setFilter('Acción')" id="flt-Acción" class="flt-btn px-3 py-1.5 rounded-lg font-medium bg-slate-800 text-slate-300 hover:bg-slate-700 transition cursor-pointer">Acciones</button>
                 </div>
             </div>
-
-            <div id="comparison-table"></div>
         </div>
-
     </main>
 
-    <!-- Footer -->
-    <footer class="border-t border-slate-800/60 py-5 mt-8 text-center text-xs text-slate-500 px-4">
-        <p><strong>AssetCompare Pro:</strong> Comparativa orientativa de costes (TER), rentabilidad histórica y estructura fiscal.</p>
-    </footer>
-
     <script>
-        const PRODUCTS = {
-            vanguard_world: { type: 'Fondo Indexado', badgeColor: 'text-sky-400', name: 'Vanguard Global Stock Index', isin: 'IE00B03HCZ61', ter: 0.18, return10y: '+11.2% / año', replication: 'Física completa', fiscality: 'Traspasable', risk: 'Medio' },
-            amundi_world: { type: 'Fondo Indexado', badgeColor: 'text-sky-400', name: 'Amundi Index MSCI World', isin: 'LU1829221024', ter: 0.12, return10y: '+11.0% / año', replication: 'Sintética / Física', fiscality: 'Traspasable', risk: 'Medio' },
-            ishares_sp500: { type: 'ETF', badgeColor: 'text-indigo-400', name: 'iShares Core S&P 500 ETF', isin: 'IE00B5BMR087', ter: 0.07, return10y: '+13.5% / año', replication: 'Física completa', fiscality: 'Tributa al vender', risk: 'Medio-Alto' },
-            vanguard_vwce: { type: 'ETF', badgeColor: 'text-indigo-400', name: 'Vanguard FTSE All-World ETF', isin: 'IE00BK5BQT80', ter: 0.22, return10y: '+10.8% / año', replication: 'Física optimizada', fiscality: 'Tributa al vender', risk: 'Medio' },
-            groupama: { type: 'Monetario', badgeColor: 'text-emerald-400', name: 'Groupama Trésorerie IC', isin: 'FR0000989626', ter: 0.10, return10y: 'TIR actual ~3.45%', replication: 'Corto plazo EUR', fiscality: 'Traspasable', risk: 'Muy Bajo' },
-            axa_treasury: { type: 'Monetario', badgeColor: 'text-emerald-400', name: 'AXA Court Terme AC', isin: 'FR0000447823', ter: 0.12, return10y: 'TIR actual ~3.35%', replication: 'Corto plazo EUR', fiscality: 'Traspasable', risk: 'Muy Bajo' },
-            apple: { type: 'Acción', badgeColor: 'text-amber-400', name: 'Apple Inc. (AAPL)', isin: 'US0378331005', ter: 0.00, return10y: '+24.5% / año', replication: 'Acción directa', fiscality: 'Tributa al vender', risk: 'Alto' },
-            microsoft: { type: 'Acción', badgeColor: 'text-amber-400', name: 'Microsoft Corp. (MSFT)', isin: 'US5949181045', ter: 0.00, return10y: '+26.2% / año', replication: 'Acción directa', fiscality: 'Tributa al vender', risk: 'Alto' }
-        };
+        let categoriaActiva = "Todas";
+        let recetaSeleccionadaIdx = 0;
+        let racionesBase = 4;
+        let racionesActuales = 4;
 
-        let currentFilter = 'all';
+        function normalizar(str) {
+            return (str || "")
+                .toLowerCase()
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "")
+                .trim();
+        }
 
-        function addCustomProduct() {
-            const rawInput = document.getElementById('custom-input').value.trim().toUpperCase();
-            const prodType = document.getElementById('custom-type').value;
+        function escalarLineaIngrediente(linea, factor) {
+            if (!factor || Math.abs(factor - 1) < 0.01) return linea;
+            return linea.replace(/^(\d+(?:[.,]\d+)?)/, (match) => {
+                const num = parseFloat(match.replace(",", "."));
+                if (Number.isNaN(num)) return match;
+                const escalado = num * factor;
+                const formateado = Number.isInteger(escalado)
+                    ? String(escalado)
+                    : escalado.toFixed(1).replace(".", ",").replace(",0", "");
+                return formateado;
+            });
+        }
 
-            if (!rawInput) {
-                alert('Por favor, introduce un Ticker o ISIN válido.');
+        function renderizarChipsCategorias(recetas) {
+            const cont = document.getElementById("chips-categorias");
+            const cats = ["Todas", ...Array.from(new Set(recetas.map(r => r.categoria).filter(Boolean))).sort()];
+            cont.innerHTML = cats.map(cat => {
+                const activa = cat === categoriaActiva;
+                const cls = activa
+                    ? "bg-emerald-500 text-slate-950 font-semibold border-emerald-400"
+                    : "bg-slate-800/90 hover:bg-slate-700 text-slate-300 border-slate-700/80";
+                return `<button type="button" onclick="seleccionarCategoria('${cat.replace(/'/g, "\\'")}')" class="shrink-0 px-3 py-1.5 rounded-lg text-xs font-mono border transition cursor-pointer">${cat}</button>`;
+            }).join("");
+        }
+
+        function seleccionarCategoria(cat) {
+            categoriaActiva = cat;
+            filtrarYMostrar();
+        }
+
+        function cambiarRaciones(delta) {
+            if (!racionesActuales || racionesActuales < 1) return;
+            racionesActuales = Math.max(1, racionesActuales + delta);
+            mostrarDetalleReceta(recetaSeleccionadaIdx, false);
+        }
+
+        function filtrarYMostrar() {
+            const todas = window.RECETAS_DATA || [];
+            const query = normalizar(document.getElementById("buscador-recetas").value);
+
+            renderizarChipsCategorias(todas);
+
+            const filtradas = todas
+                .map((r, originalIdx) => ({ ...r, _idx: originalIdx }))
+                .filter(r => {
+                    const okCat = categoriaActiva === "Todas" || r.categoria === categoriaActiva;
+                    if (!okCat) return false;
+                    if (!query) return true;
+                    return (
+                        normalizar(r.titulo).includes(query) ||
+                        normalizar(r.ingredientes).includes(query) ||
+                        normalizar(r.categoria).includes(query)
+                    );
+                });
+
+            document.getElementById("contador-recetas").textContent = filtradas.length;
+            const listaEl = document.getElementById("lista-recetas");
+
+            if (filtradas.length === 0) {
+                listaEl.innerHTML = `<div class="glass-card rounded-xl p-5 text-center text-sm text-slate-400">No hay recetas que coincidan con ese filtro.</div>`;
                 return;
             }
 
-            const key = 'custom_' + rawInput.toLowerCase().replace(/[^a-z0-9]/g, '_');
-            
-            // Generar valores estimados coherentes según el tipo seleccionado
-            let estTer = prodType === 'Acción' ? 0.00 : (prodType === 'ETF' ? 0.15 : 0.20);
-            let estReturn = prodType === 'Monetario' ? 'TIR actual ~3.5%' : (prodType === 'Acción' ? '+15.0% / año' : '+10.5% / año');
+            if (!filtradas.some(r => r._idx === recetaSeleccionadaIdx)) {
+                recetaSeleccionadaIdx = filtradas[0]._idx;
+                mostrarDetalleReceta(recetaSeleccionadaIdx, true);
+            }
 
-            PRODUCTS[key] = {
-                type: prodType,
-                badgeColor: prodType === 'ETF' ? 'text-indigo-400' : (prodType === 'Fondo Indexado' ? 'text-sky-400' : (prodType === 'Monetario' ? 'text-emerald-400' : 'text-amber-400')),
-                name: `Personalizado (${rawInput})`,
-                isin: rawInput.length >= 10 ? rawInput : 'CUSTOM-' + rawInput,
-                ter: estTer,
-                return10y: estReturn,
-                replication: 'Estimado / Búsqueda',
-                fiscality: prodType.includes('Fondo') || prodType.includes('Monetario') ? 'Traspasable' : 'Tributa al vender',
-                risk: 'Variable'
-            };
-
-            // Añadir la nueva opción a todos los desplegables de la misma categoría o generales
-            const targetSelects = document.querySelectorAll('.sel-prod');
-            targetSelects.forEach(sel => {
-                const opt = document.createElement('option');
-                opt.value = key;
-                opt.text = `${rawInput} (${prodType})`;
-                sel.add(opt);
-            });
-
-            document.getElementById('custom-input').value = '';
-            updateComparison();
-            alert(`¡Producto "${rawInput}" añadido correctamente y disponible en los selectores!`);
-        }
-
-        function setFilter(filterVal) {
-            currentFilter = filterVal;
-            document.querySelectorAll('.flt-btn').forEach(btn => {
-                btn.className = 'flt-btn px-3 py-1.5 rounded-lg font-medium bg-slate-800 text-slate-300 hover:bg-slate-700 transition cursor-pointer';
-            });
-            const activeBtn = document.getElementById(`flt-${filterVal}`);
-            if (activeBtn) activeBtn.className = 'flt-btn px-3 py-1.5 rounded-lg font-medium bg-sky-500 text-slate-950 transition cursor-pointer';
-            updateComparison();
-        }
-
-        function updateDuelSummary(elementId, itemA, itemB) {
-            const diffTer = Math.abs(itemA.ter - itemB.ter).toFixed(2);
-            let terMsg = itemA.ter === itemB.ter ? 'Empate en TER' : (itemA.ter < itemB.ter ? 'A es más barato' : 'B es más barato');
-            document.getElementById(elementId).innerHTML = `
-                <div class="flex justify-between text-slate-300">
-                    <span>TER A vs B:</span>
-                    <span class="font-mono font-semibold">${itemA.ter.toFixed(2)}% vs ${itemB.ter.toFixed(2)}%</span>
-                </div>
-                <div class="text-[11px] font-mono text-emerald-400">${terMsg}</div>
-            `;
-        }
-
-        function updateComparison() {
-            const selections = [
-                { slot: 'A', item: PRODUCTS[document.getElementById('sel-fondo-a').value] },
-                { slot: 'B', item: PRODUCTS[document.getElementById('sel-fondo-b').value] },
-                { slot: 'A', item: PRODUCTS[document.getElementById('sel-etf-a').value] },
-                { slot: 'B', item: PRODUCTS[document.getElementById('sel-etf-b').value] },
-                { slot: 'A', item: PRODUCTS[document.getElementById('sel-monetary-a').value] },
-                { slot: 'B', item: PRODUCTS[document.getElementById('sel-monetary-b').value] },
-                { slot: 'A', item: PRODUCTS[document.getElementById('sel-stock-a').value] },
-                { slot: 'B', item: PRODUCTS[document.getElementById('sel-stock-b').value] }
-            ];
-
-            updateDuelSummary('duel-fondo', selections[0].item, selections[1].item);
-            updateDuelSummary('duel-etf', selections[2].item, selections[3].item);
-            updateDuelSummary('duel-monetary', selections[4].item, selections[5].item);
-            updateDuelSummary('duel-stock', selections[6].item, selections[7].item);
-
-            const filtered = currentFilter === 'all' ? selections : selections.filter(s => s.item.type === currentFilter);
-
-            let tableHtml = `
-                <table class="w-full text-left text-xs sm:text-sm">
-                    <thead>
-                        <tr class="border-b border-slate-800 text-slate-400">
-                            <th class="py-3 px-3">Lado</th>
-                            <th class="py-3 px-3">Producto / ISIN</th>
-                            <th class="py-3 px-3">Categoría</th>
-                            <th class="py-3 px-3">Comisión (TER)</th>
-                            <th class="py-3 px-3">Rentabilidad</th>
-                            <th class="py-3 px-3">Réplica</th>
-                            <th class="py-3 px-3">Fiscalidad</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-slate-800/60">
-            `;
-
-            filtered.forEach(entry => {
-                const p = entry.item;
-                const slotBadge = entry.slot === 'A' ? 'bg-sky-500/20 text-sky-300 border-sky-500/30' : 'bg-purple-500/20 text-purple-300 border-purple-500/30';
-                tableHtml += `
-                    <tr class="hover:bg-slate-900/40 transition">
-                        <td class="py-3 px-3"><span class="px-2 py-0.5 rounded border font-mono text-xs font-bold ${slotBadge}">${entry.slot}</span></td>
-                        <td class="py-3 px-3"><div class="font-semibold text-white">${p.name}</div><div class="text-[11px] font-mono text-slate-500">${p.isin}</div></td>
-                        <td class="py-3 px-3"><span class="font-mono text-xs font-medium ${p.badgeColor}">${p.type}</span></td>
-                        <td class="py-3 px-3 font-mono font-bold text-white">${p.ter.toFixed(2)}%</td>
-                        <td class="py-3 px-3 font-mono text-emerald-400 font-medium">${p.return10y}</td>
-                        <td class="py-3 px-3 text-slate-300 text-xs">${p.replication}</td>
-                        <td class="py-3 px-3 text-slate-400 text-xs">${p.fiscality}</td>
-                    </tr>
+            listaEl.innerHTML = filtradas.map(r => {
+                const sel = r._idx === recetaSeleccionadaIdx;
+                const borde = sel
+                    ? "border-emerald-500/80 bg-slate-900/95 shadow-lg shadow-emerald-500/10"
+                    : "border-slate-800/80 bg-slate-900/50 hover:border-slate-700";
+                return `
+                    <button type="button" onclick="seleccionarReceta(${r._idx})" class="w-full text-left p-4 rounded-xl border ${borde} transition cursor-pointer block">
+                        <div class="flex items-center justify-between gap-2 mb-1">
+                            <span class="text-[11px] font-mono uppercase px-2 py-0.5 rounded bg-slate-800 text-emerald-300 border border-slate-700">${r.categoria || "General"}</span>
+                            <span class="text-xs font-mono text-slate-400">${r.tiempo || ""}</span>
+                        </div>
+                        <div class="font-semibold text-white text-sm sm:text-base">${r.titulo}</div>
+                        <div class="text-xs text-slate-500 mt-1 truncate">${(r.ingredientes || "Sin ingredientes detallados aún").replace(/\n/g, " · ")}</div>
+                    </button>
                 `;
-            });
-
-            tableHtml += `</tbody></table>`;
-            document.getElementById('comparison-table').innerHTML = tableHtml;
+            }).join("");
         }
 
-        window.addEventListener('DOMContentLoaded', () => { updateComparison(); });
+        function seleccionarReceta(idx) {
+            recetaSeleccionadaIdx = idx;
+            mostrarDetalleReceta(idx, true);
+            filtrarYMostrar();
+        }
+
+        function mostrarDetalleReceta(idx, resetRaciones = true) {
+            const todas = window.RECETAS_DATA || [];
+            const r = todas[idx];
+            if (!r) return;
+
+            if (resetRaciones) {
+                const numParsed = parseInt(String(r.raciones || "").replace(/\D/g, ""), 10);
+                racionesBase = !Number.isNaN(numParsed) && numParsed > 0 ? numParsed : 0;
+                racionesActuales = racionesBase;
+            }
+
+            document.getElementById("det-categoria").textContent = r.categoria || "General";
+            document.getElementById("det-titulo").textContent = r.titulo;
+            document.getElementById("det-tiempo").textContent = r.tiempo || "No indicado";
+            document.getElementById("det-raciones").textContent = racionesActuales > 0 ? racionesActuales : (r.raciones || "--");
+
+            const factor = (racionesBase > 0 && racionesActuales > 0) ? (racionesActuales / racionesBase) : 1;
+            const notaEsc = document.getElementById("nota-escalado");
+            notaEsc.classList.toggle("hidden", Math.abs(factor - 1) < 0.01);
+
+            const lineasIng = (r.ingredientes || "")
+                .split(/\r?\n|;/)
+                .map(s => s.trim())
+                .filter(Boolean);
+
+            const ingEl = document.getElementById("det-ingredientes");
+            if (lineasIng.length > 0) {
+                ingEl.innerHTML = lineasIng.map((linea, i) => {
+                    const escalada = escalarLineaIngrediente(linea, factor);
+                    return `
+                        <label class="flex items-start gap-2.5 p-2.5 rounded-lg bg-slate-950/60 border border-slate-800/80 cursor-pointer hover:border-slate-700">
+                            <input type="checkbox" class="mt-1 rounded accent-emerald-500">
+                            <span>${escalada}</span>
+                        </label>
+                    `;
+                }).join("");
+            } else {
+                ingEl.innerHTML = `<li class="col-span-2 text-slate-500 italic">Aún no se han añadido ingredientes para esta receta en la hoja.</li>`;
+            }
+
+            const lineasPasos = (r.pasos || "")
+                .split(/\r?\n/)
+                .map(s => s.replace(/^\d+[\.\)\-]\s*/, "").trim())
+                .filter(Boolean);
+
+            const pasosEl = document.getElementById("det-pasos");
+            if (lineasPasos.length > 0) {
+                pasosEl.innerHTML = lineasPasos.map((paso, i) => `
+                    <li class="flex gap-3 p-3.5 rounded-xl bg-slate-950/60 border border-slate-800/80">
+                        <span class="shrink-0 w-6 h-6 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 font-mono text-xs font-bold flex items-center justify-center">${i + 1}</span>
+                        <span>${paso}</span>
+                    </li>
+                `).join("");
+            } else {
+                pasosEl.innerHTML = `<li class="text-slate-500 italic">Aún no se han detallado los pasos de esta receta en la hoja.</li>`;
+            }
+        }
+
+        function inicializarRecetario() {
+            const meta = window.SHEET_META || {};
+            const link = document.getElementById("link-sheet");
+            if (meta.sheet_url && link) {
+                link.href = meta.sheet_url;
+                link.classList.remove("hidden");
+            }
+            const badge = document.getElementById("badge-sync");
+            if (badge) {
+                badge.innerHTML = meta.conectado
+                    ? `<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Conectado a Sheets`
+                    : `<span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span> Vista Previa`;
+            }
+
+            const todas = window.RECETAS_DATA || [];
+            if (todas.length > 0) {
+                mostrarDetalleReceta(0, true);
+            }
+            filtrarYMostrar();
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            document.getElementById("buscador-recetas").addEventListener("input", filtrarYMostrar);
+            inicializarRecetario();
+        });
     </script>
 </body>
 </html>
